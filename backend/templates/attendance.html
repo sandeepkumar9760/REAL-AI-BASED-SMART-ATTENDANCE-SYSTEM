@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Attendance - Smart Attendance System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-brand .icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbar-brand .icon svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        .navbar-brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .back-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .filter-group select {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #ffffff;
+        }
+
+        /* Students List */
+        .students-section {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .students-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .students-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .students-header .count {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        .mark-all-btn {
+            padding: 10px 20px;
+            background: #d1fae5;
+            color: #059669;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mark-all-btn:hover {
+            background: #a7f3d0;
+        }
+
+        /* Student List Items */
+        .students-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.2s ease;
+        }
+
+        .student-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-item:hover {
+            background: #f9fafb;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .student-avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .student-details h4 {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .student-details p {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        /* Custom Checkbox */
+        .attendance-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            color: #6b7280;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .toggle-label.present {
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .toggle-label.absent {
+            color: #ef4444;
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ef4444;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #10b981;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Submit Section */
+        .submit-section {
+            padding: 24px;
+            background: #f9fafb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .attendance-summary {
+            display: flex;
+            gap: 24px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .summary-dot.present {
+            background: #10b981;
+        }
+
+        .summary-dot.absent {
+            background: #ef4444;
+        }
+
+        .summary-item span {
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .summary-item strong {
+            font-weight: 600;
+        }
+
+        .submit-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(102, 126, 234, 0.5);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1f2937;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #059669;
+        }
+
+        .toast svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Absentee Alert */
+        .absentee-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .absentee-alert.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .alert-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .absentee-alert.show .alert-content {
+            transform: scale(1);
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .alert-icon {
+            width: 48px;
+            height: 48px;
+            background: #fef3c7;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert-icon svg {
+            width: 24px;
+            height: 24px;
+            color: #f59e0b;
+        }
+
+        .alert-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .absentee-list {
+            margin-bottom: 24px;
+        }
+
+        .absentee-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fef2f2;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .absentee-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .absentee-item .dot {
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+        }
+
+        .absentee-item span {
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .alert-close-btn {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alert-close-btn:hover {
+            background: #5a67d8;
+        }
+
+        @media (max-width: 640px) {
+            .navbar-brand h1 {
+                display: none;
+            }
+
+            .page-header h2 {
+                font-size: 20px;
+            }
+
+            .students-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .student-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .attendance-toggle {
+                align-self: flex-end;
+            }
+
+            .submit-section {
+                flex-direction: column;
+            }
+
+            .attendance-summary {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-brand">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <h1>Smart Attendance System</h1>
+            </div>
+            <button class="back-btn" onclick="goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>Back to Dashboard</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h2>Mark Attendance</h2>
+            <p>Select class and subject, then mark attendance for each student</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="classSelect">Class</label>
+                    <select id="classSelect" onchange="loadStudents()">
+                        <option value="">Select Class</option>
+                        <option value="10A">Class 10-A</option>
+                        <option value="10B">Class 10-B</option>
+                        <option value="11A">Class 11-A</option>
+                        <option value="11B">Class 11-B</option>
+                        <option value="12A">Class 12-A</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="subjectSelect">Subject</label>
+                    <select id="subjectSelect">
+                        <option value="">Select Subject</option>
+                        <option value="math">Mathematics</option>
+                        <option value="physics">Physics</option>
+                        <option value="chemistry">Chemistry</option>
+                        <option value="english">English</option>
+                        <option value="cs">Computer Science</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="dateSelect">Date</label>
+                    <select id="dateSelect">
+                        <option value="today">Today</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students List -->
+        <div class="students-section">
+            <div class="students-header">
+                <h3>Students <span class="count" id="studentCount">(0 students)</span></h3>
+                <button class="mark-all-btn" onclick="markAllPresent()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 16px; height: 16px; display: inline; vertical-align: middle; margin-right: 4px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Mark All Present
+                </button>
+            </div>
+
+            <div class="students-list" id="studentsList">
+                <div style="padding: 48px 24px; text-align: center; color: #6b7280;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 48px; height: 48px; margin: 0 auto 16px; color: #d1d5db;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <p>Select a class to view students</p>
+                </div>
+            </div>
+
+            <div class="submit-section" id="submitSection" style="display: none;">
+                <div class="attendance-summary">
+                    <div class="summary-item">
+                        <span class="summary-dot present"></span>
+                        <span>Present: <strong id="presentCount">0</strong></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-dot absent"></span>
+                        <span>Absent: <strong id="absentCount">0</strong></span>
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="submitAttendance()">Submit Attendance</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span id="toastMessage">Attendance submitted successfully!</span>
+    </div>
+
+    <!-- Absentee Alert Modal -->
+    <div class="absentee-alert" id="absenteeAlert">
+        <div class="alert-content">
+            <div class="alert-header">
+                <div class="alert-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h3>Absent Students Detected</h3>
+            </div>
+            <div class="absentee-list" id="absenteeList">
+                <!-- Populated by JavaScript -->
+            </div>
+            <button class="alert-close-btn" onclick="closeAbsenteeAlert()">Acknowledge & Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Dummy student data - will be replaced with Django API
+        const studentsData = {
+            '10A': [
+                { id: 1, name: 'Aditya Sharma', rollNo: '10A001' },
+                { id: 2, name: 'Priya Patel', rollNo: '10A002' },
+                { id: 3, name: 'Rahul Singh', rollNo: '10A003' },
+                { id: 4, name: 'Sneha Gupta', rollNo: '10A004' },
+                { id: 5, name: 'Vikram Reddy', rollNo: '10A005' },
+                { id: 6, name: 'Ananya Krishnan', rollNo: '10A006' },
+                { id: 7, name: 'Mohammed Khan', rollNo: '10A007' },
+                { id: 8, name: 'Kavitha Nair', rollNo: '10A008' },
+            ],
+            '10B': [
+                { id: 9, name: 'Arjun Menon', rollNo: '10B001' },
+                { id: 10, name: 'Deepika Joshi', rollNo: '10B002' },
+                { id: 11, name: 'Sanjay Verma', rollNo: '10B003' },
+                { id: 12, name: 'Meera Iyer', rollNo: '10B004' },
+                { id: 13, name: 'Karthik Rajan', rollNo: '10B005' },
+                { id: 14, name: 'Pooja Sharma', rollNo: '10B006' },
+            ],
+            '11A': [
+                { id: 15, name: 'Rohit Kumar', rollNo: '11A001' },
+                { id: 16, name: 'Anjali Das', rollNo: '11A002' },
+                { id: 17, name: 'Suresh Babu', rollNo: '11A003' },
+                { id: 18, name: 'Lakshmi Rao', rollNo: '11A004' },
+                { id: 19, name: 'Nikhil Saxena', rollNo: '11A005' },
+            ],
+            '11B': [
+                { id: 20, name: 'Amit Tiwari', rollNo: '11B001' },
+                { id: 21, name: 'Swati Mishra', rollNo: '11B002' },
+                { id: 22, name: 'Rajesh Pillai', rollNo: '11B003' },
+                { id: 23, name: 'Divya Nambiar', rollNo: '11B004' },
+            ],
+            '12A': [
+                { id: 24, name: 'Varun Malhotra', rollNo: '12A001' },
+                { id: 25, name: 'Shruti Agarwal', rollNo: '12A002' },
+                { id: 26, name: 'Manish Dubey', rollNo: '12A003' },
+                { id: 27, name: 'Neha Kapoor', rollNo: '12A004' },
+                { id: 28, name: 'Pranav Shetty', rollNo: '12A005' },
+                { id: 29, name: 'Ritu Bansal', rollNo: '12A006' },
+                { id: 30, name: 'Gaurav Pandey', rollNo: '12A007' },
+            ]
+        };
+
+        // Current attendance state
+        let attendanceState = {};
+
+        // Check authentication
+        function checkAuth() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (!isLoggedIn) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize page
+        function init() {
+            if (!checkAuth()) return;
+
+            // Set today's date
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('dateSelect').innerHTML = `<option value="today">${dateStr}</option>`;
+        }
+
+        // Load students based on selected class
+        function loadStudents() {
+            const classSelect = document.getElementById('classSelect');
+            const selectedClass = classSelect.value;
+            const studentsList = document.getElementById('studentsList');
+            const submitSection = document.getElementById('submitSection');
+            const studentCount = document.getElementById('studentCount');
+
+            if (!selectedClass) {
+                studentsList.innerHTML = `
+                    <div style="padding: 48px 24px; text-align: center; color: #6b7280;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 48px; height: 48px; margin: 0 auto 16px; color: #d1d5db;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p>Select a class to view students</p>
+                    </div>
+                `;
+                submitSection.style.display = 'none';
+                return;
+            }
+
+            // TODO: Replace with Django API call
+            // fetch(`/api/students/?class=${selectedClass}`)
+            //     .then(response => response.json())
+            //     .then(data => { renderStudents(data); });
+
+            const students = studentsData[selectedClass] || [];
+            
+            // Initialize attendance state for all students (default: present)
+            attendanceState = {};
+            students.forEach(student => {
+                attendanceState[student.id] = true; // true = present
+            });
+
+            renderStudents(students);
+            studentCount.textContent = `(${students.length} students)`;
+            submitSection.style.display = 'flex';
+            updateSummary();
+        }
+
+        // Render student list
+        function renderStudents(students) {
+            const studentsList = document.getElementById('studentsList');
+
+            if (students.length === 0) {
+                studentsList.innerHTML = `
+                    <div style="padding: 48px 24px; text-align: center; color: #6b7280;">
+                        <p>No students found in this class</p>
+                    </div>
+                `;
+                return;
+            }
+
+            studentsList.innerHTML = students.map(student => `
+                <div class="student-item">
+                    <div class="student-info">
+                        <div class="student-avatar">${getInitials(student.name)}</div>
+                        <div class="student-details">
+                            <h4>${student.name}</h4>
+                            <p>Roll No: ${student.rollNo}</p>
+                        </div>
+                    </div>
+                    <div class="attendance-toggle">
+                        <span class="toggle-label ${attendanceState[student.id] ? 'present' : 'absent'}" id="label-${student.id}">
+                            ${attendanceState[student.id] ? 'Present' : 'Absent'}
+                        </span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" 
+                                   id="attendance-${student.id}" 
+                                   ${attendanceState[student.id] ? 'checked' : ''} 
+                                   onchange="toggleAttendance(${student.id})">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get initials from name
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // Toggle attendance for a student
+        function toggleAttendance(studentId) {
+            attendanceState[studentId] = !attendanceState[studentId];
+            
+            const label = document.getElementById(`label-${studentId}`);
+            label.textContent = attendanceState[studentId] ? 'Present' : 'Absent';
+            label.className = `toggle-label ${attendanceState[studentId] ? 'present' : 'absent'}`;
+            
+            updateSummary();
+        }
+
+        // Mark all students as present
+        function markAllPresent() {
+            Object.keys(attendanceState).forEach(id => {
+                attendanceState[id] = true;
+                const checkbox = document.getElementById(`attendance-${id}`);
+                const label = document.getElementById(`label-${id}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+                if (label) {
+                    label.textContent = 'Present';
+                    label.className = 'toggle-label present';
+                }
+            });
+            updateSummary();
+        }
+
+        // Update attendance summary
+        function updateSummary() {
+            const total = Object.keys(attendanceState).length;
+            const present = Object.values(attendanceState).filter(v => v).length;
+            const absent = total - present;
+
+            document.getElementById('presentCount').textContent = present;
+            document.getElementById('absentCount').textContent = absent;
+        }
+
+        // Submit attendance
+        function submitAttendance() {
+            const classSelect = document.getElementById('classSelect');
+            const subjectSelect = document.getElementById('subjectSelect');
+
+            if (!classSelect.value) {
+                alert('Please select a class');
+                return;
+            }
+
+            if (!subjectSelect.value) {
+                alert('Please select a subject');
+                return;
+            }
+
+            // Prepare attendance data for API
+            const attendanceData = {
+                class: classSelect.value,
+                subject: subjectSelect.value,
+                date: new Date().toISOString().split('T')[0],
+                attendance: Object.entries(attendanceState).map(([id, isPresent]) => ({
+                    studentId: parseInt(id),
+                    present: isPresent
+                }))
+            };
+
+            // TODO: Replace with Django API call
+            // fetch('/api/attendance/submit/', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(attendanceData)
+            // }).then(response => response.json())
+            //   .then(data => { ... });
+
+            console.log('Attendance Data:', attendanceData);
+
+            // Show success toast
+            showToast('Attendance submitted successfully!');
+
+            // Simulate absentee detection
+            const absentStudents = [];
+            const students = studentsData[classSelect.value] || [];
+            
+            students.forEach(student => {
+                if (!attendanceState[student.id]) {
+                    absentStudents.push(student);
+                }
+            });
+
+            // Show absentee alert if there are absent students
+            if (absentStudents.length > 0) {
+                setTimeout(() => {
+                    showAbsenteeAlert(absentStudents);
+                }, 1500);
+            }
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show', 'success');
+
+            setTimeout(() => {
+                toast.classList.remove('show', 'success');
+            }, 3000);
+        }
+
+        // Show absentee alert modal
+        function showAbsenteeAlert(absentStudents) {
+            const alert = document.getElementById('absenteeAlert');
+            const list = document.getElementById('absenteeList');
+
+            list.innerHTML = absentStudents.map(student => `
+                <div class="absentee-item">
+                    <span class="dot"></span>
+                    <span>${student.name} (${student.rollNo})</span>
+                </div>
+            `).join('');
+
+            alert.classList.add('show');
+        }
+
+        // Close absentee alert
+        function closeAbsenteeAlert() {
+            const alert = document.getElementById('absenteeAlert');
+            alert.classList.remove('show');
+        }
+
+        // Go back to dashboard
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Close modal on outside click
+        document.getElementById('absenteeAlert').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAbsenteeAlert();
+            }
+        });
+    </script>
+</body>
+</html>

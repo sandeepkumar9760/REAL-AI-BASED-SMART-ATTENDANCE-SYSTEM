@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Attendance System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-brand .icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbar-brand .icon svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        .navbar-brand h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #fecaca;
+        }
+
+        .logout-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .welcome-section {
+            margin-bottom: 32px;
+        }
+
+        .welcome-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .welcome-section p {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.mark-attendance {
+            border-color: #667eea;
+        }
+
+        .card.mark-attendance:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card.mark-attendance:hover .card-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .card.mark-attendance:hover .card-title,
+        .card.mark-attendance:hover .card-description,
+        .card.mark-attendance:hover .card-icon svg {
+            color: white;
+        }
+
+        .card.view-attendance:hover {
+            border-color: #10b981;
+        }
+
+        .card.absent-students:hover {
+            border-color: #f59e0b;
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card-icon svg {
+            width: 28px;
+            height: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .card.mark-attendance .card-icon {
+            background: #eef2ff;
+        }
+
+        .card.mark-attendance .card-icon svg {
+            color: #667eea;
+        }
+
+        .card.view-attendance .card-icon {
+            background: #d1fae5;
+        }
+
+        .card.view-attendance .card-icon svg {
+            color: #10b981;
+        }
+
+        .card.absent-students .card-icon {
+            background: #fef3c7;
+        }
+
+        .card.absent-students .card-icon svg {
+            color: #f59e0b;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .card-description {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+        }
+
+        .card-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .card-arrow svg {
+            width: 20px;
+            height: 20px;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .card-arrow svg {
+            color: #667eea;
+            transform: translateX(4px);
+        }
+
+        .card.mark-attendance:hover .card-arrow svg {
+            color: white;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            margin-top: 40px;
+        }
+
+        .stats-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .stat-card.present .stat-value {
+            color: #10b981;
+        }
+
+        .stat-card.absent .stat-value {
+            color: #ef4444;
+        }
+
+        .stat-card.total .stat-value {
+            color: #667eea;
+        }
+
+        @media (max-width: 640px) {
+            .navbar-brand h1 {
+                font-size: 16px;
+            }
+
+            .logout-btn span {
+                display: none;
+            }
+
+            .logout-btn {
+                padding: 10px;
+            }
+
+            .welcome-section h2 {
+                font-size: 22px;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-brand">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <h1>Smart Attendance System</h1>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="welcome-section">
+            <h2>Welcome back, <span id="userName">Admin</span>!</h2>
+            <p>Manage your class attendance efficiently</p>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <div class="card mark-attendance" onclick="navigateTo('attendance.html')">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="card-title">Mark Attendance</h3>
+                <p class="card-description">Record today's attendance for your class. Mark students as present or absent quickly.</p>
+                <div class="card-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card view-attendance" onclick="showComingSoon('View Attendance')">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <h3 class="card-title">View Attendance</h3>
+                <p class="card-description">View and analyze attendance records. Generate reports by date, class, or student.</p>
+                <div class="card-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card absent-students" onclick="showComingSoon('Absent Students')">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <h3 class="card-title">Absent Students</h3>
+                <p class="card-description">View list of absent students. Track chronic absenteeism and send notifications.</p>
+                <div class="card-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-section">
+            <h3>Today's Quick Stats</h3>
+            <div class="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-value" id="totalStudents">120</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card present">
+                    <div class="stat-value" id="presentToday">108</div>
+                    <div class="stat-label">Present Today</div>
+                </div>
+                <div class="stat-card absent">
+                    <div class="stat-value" id="absentToday">12</div>
+                    <div class="stat-label">Absent Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="attendanceRate">90%</div>
+                    <div class="stat-label">Attendance Rate</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Check authentication
+        function checkAuth() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (!isLoggedIn) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize page
+        function init() {
+            if (!checkAuth()) return;
+
+            // Set username
+            const username = sessionStorage.getItem('username') || 'Admin';
+            document.getElementById('userName').textContent = username;
+
+            // Load stats from session (simulated data)
+            loadStats();
+        }
+
+        // Load dashboard statistics
+        // TODO: Replace with Django API call
+        function loadStats() {
+            // Simulated stats - will be replaced with API data
+            const stats = {
+                totalStudents: 120,
+                presentToday: 108,
+                absentToday: 12,
+                attendanceRate: '90%'
+            };
+
+            // TODO: Replace with actual Django API call
+            // fetch('/api/dashboard/stats/')
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         updateStatsUI(data);
+            //     });
+
+            updateStatsUI(stats);
+        }
+
+        function updateStatsUI(stats) {
+            document.getElementById('totalStudents').textContent = stats.totalStudents;
+            document.getElementById('presentToday').textContent = stats.presentToday;
+            document.getElementById('absentToday').textContent = stats.absentToday;
+            document.getElementById('attendanceRate').textContent = stats.attendanceRate;
+        }
+
+        // Navigation function
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        // Coming soon alert
+        function showComingSoon(feature) {
+            alert(feature + ' feature coming soon! This will be available after Django API integration.');
+        }
+
+        // Logout function
+        function logout() {
+            // TODO: Replace with Django API call
+            // fetch('/api/logout/', { method: 'POST' })
+            //     .then(() => { ... });
+
+            sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('username');
+            window.location.href = 'login.html';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
