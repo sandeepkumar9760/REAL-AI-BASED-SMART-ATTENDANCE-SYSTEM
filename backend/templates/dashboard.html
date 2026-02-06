@@ -323,25 +323,25 @@
                 </div>
                 <h1>Smart Attendance System</h1>
             </div>
-            <button class="logout-btn" onclick="logout()">
+            <a href="{% url 'logout' %}" class="logout-btn" style="text-decoration: none;">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 <span>Logout</span>
-            </button>
+            </a>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="main-content">
         <div class="welcome-section">
-            <h2>Welcome back, <span id="userName">Admin</span>!</h2>
+            <h2>Welcome back, Admin!</h2>
             <p>Manage your class attendance efficiently</p>
         </div>
 
         <!-- Dashboard Cards -->
         <div class="dashboard-cards">
-            <div class="card mark-attendance" onclick="navigateTo('attendance.html')">
+            <div class="card mark-attendance" onclick="navigateTo('{% url 'attendance' %}')">
                 <div class="card-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -392,19 +392,25 @@
             <h3>Today's Quick Stats</h3>
             <div class="stats-grid">
                 <div class="stat-card total">
-                    <div class="stat-value" id="totalStudents">120</div>
+                    <div class="stat-value">{{ total_students }}</div>
                     <div class="stat-label">Total Students</div>
                 </div>
                 <div class="stat-card present">
-                    <div class="stat-value" id="presentToday">108</div>
+                    <div class="stat-value">{{ present_today }}</div>
                     <div class="stat-label">Present Today</div>
                 </div>
                 <div class="stat-card absent">
-                    <div class="stat-value" id="absentToday">12</div>
+                    <div class="stat-value">{{ absent_today }}</div>
                     <div class="stat-label">Absent Today</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="attendanceRate">90%</div>
+                    <div class="stat-value">
+                        {% if total_students > 0 %}
+                            {% widthratio present_today total_students 100 %}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </div>
                     <div class="stat-label">Attendance Rate</div>
                 </div>
             </div>
@@ -412,79 +418,15 @@
     </main>
 
     <script>
-        // Check authentication
-        function checkAuth() {
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-            if (!isLoggedIn) {
-                window.location.href = 'login.html';
-                return false;
-            }
-            return true;
-        }
-
-        // Initialize page
-        function init() {
-            if (!checkAuth()) return;
-
-            // Set username
-            const username = sessionStorage.getItem('username') || 'Admin';
-            document.getElementById('userName').textContent = username;
-
-            // Load stats from session (simulated data)
-            loadStats();
-        }
-
-        // Load dashboard statistics
-        // TODO: Replace with Django API call
-        function loadStats() {
-            // Simulated stats - will be replaced with API data
-            const stats = {
-                totalStudents: 120,
-                presentToday: 108,
-                absentToday: 12,
-                attendanceRate: '90%'
-            };
-
-            // TODO: Replace with actual Django API call
-            // fetch('/api/dashboard/stats/')
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         updateStatsUI(data);
-            //     });
-
-            updateStatsUI(stats);
-        }
-
-        function updateStatsUI(stats) {
-            document.getElementById('totalStudents').textContent = stats.totalStudents;
-            document.getElementById('presentToday').textContent = stats.presentToday;
-            document.getElementById('absentToday').textContent = stats.absentToday;
-            document.getElementById('attendanceRate').textContent = stats.attendanceRate;
-        }
-
         // Navigation function
-        function navigateTo(page) {
-            window.location.href = page;
+        function navigateTo(url) {
+            window.location.href = url;
         }
 
         // Coming soon alert
         function showComingSoon(feature) {
-            alert(feature + ' feature coming soon! This will be available after Django API integration.');
+            alert(feature + ' feature coming soon!');
         }
-
-        // Logout function
-        function logout() {
-            // TODO: Replace with Django API call
-            // fetch('/api/logout/', { method: 'POST' })
-            //     .then(() => { ... });
-
-            sessionStorage.removeItem('isLoggedIn');
-            sessionStorage.removeItem('username');
-            window.location.href = 'login.html';
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

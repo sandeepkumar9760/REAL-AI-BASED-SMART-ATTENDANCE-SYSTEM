@@ -1,21 +1,37 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.utils import timezone
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
+from .models import (
+    Student,
+    ClassRoom,
+    Subject,
+    AttendanceSession,
+    Attendance
+)
 
 
 # -------------------------
 # LOGIN PAGE
 # -------------------------
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        # Temporary static login (replace later)
-        if username == "admin" and password == "admin123":
-            request.session["user"] = username
-            return redirect("dashboard")
+        user = authenticate(request, username=username, password=password)
 
-        messages.error(request, "Invalid username or password")
+        if user is not None:
+            login(request, user)
+            return redirect("dashboard")
+        else:
+            messages.error(request, "Invalid username or password")
 
     return render(request, "login.html")
 
@@ -23,49 +39,109 @@ def login_view(request):
 # -------------------------
 # DASHBOARD PAGE
 # -------------------------
+@login_required(login_url="login")
 def dashboard_view(request):
-    if "user" not in request.session:
-        return redirect("login")
+    today = timezone.now().date()
+
+    total_students = Student.objects.filter(is_active=True).count()
+    present_today = Attendance.objects.filter(
+        attendance_session__date=today,
+        is_present=True
+    ).count()
+    absent_today = Attendance.objects.filter(
+        attendance_session__date=today,
+        is_present=False
+    ).count()
 
     context = {
-        "total_students": 60,
-        "present_today": 52,
-        "absent_today": 8
+        "total_students": total_students,
+        "present_today": present_today,
+        "absent_today": absent_today,
     }
+
     return render(request, "dashboard.html", context)
+
+
+# -------------------------
+# GET STUDENTS AJAX ENDPOINT
+# -------------------------
+@login_required(login_url="login")
+def get_students(request):
+    """AJAX endpoint to fetch students for a classroom"""
+    classroom_id = request.GET.get("classroom_id")
+    
+    if not classroom_id:
+        return JsonResponse({"error": "Classroom ID required"}, status=400)
+    
+    try:
+        students = Student.objects.filter(
+            classroom_id=classroom_id,
+            is_active=True
+        ).values('id', 'name', 'roll_number')
+        
+        return JsonResponse({
+            "students": list(students)
+        })
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 # -------------------------
 # ATTENDANCE PAGE
 # -------------------------
+@login_required(login_url="login")
 def attendance_view(request):
-    if "user" not in request.session:
-        return redirect("login")
-
-    students = [
-        {"roll": 1, "name": "Rahul"},
-        {"roll": 2, "name": "Aman"},
-        {"roll": 3, "name": "Neha"},
-        {"roll": 4, "name": "Priya"},
-    ]
+    classrooms = ClassRoom.objects.all()
+    subjects = Subject.objects.all()
 
     if request.method == "POST":
+        classroom_id = request.POST.get("classroom")
+        subject_id = request.POST.get("subject")
+        date = timezone.now().date()
+
+        classroom = get_object_or_404(ClassRoom, id=classroom_id)
+        subject = get_object_or_404(Subject, id=subject_id)
+
+        # Create or get attendance session
+        session, created = AttendanceSession.objects.get_or_create(
+            classroom=classroom,
+            subject=subject,
+            date=date,
+        )
+
         absentees = []
+        students = Student.objects.filter(classroom=classroom, is_active=True)
 
         for student in students:
-            if not request.POST.get(f"present_{student['roll']}"):
-                absentees.append(student["name"])
+            present = request.POST.get(f"present_{student.id}") == "on"
 
-        return render(request, "attendance_result.html", {
-            "absentees": absentees
-        })
+            Attendance.objects.update_or_create(
+                attendance_session=session,
+                student=student,
+                defaults={"is_present": present}
+            )
 
-    return render(request, "attendance.html", {"students": students})
+            if not present:
+                absentees.append(student.name)
+
+        return render(
+            request,
+            "attendance_result.html",
+            {"absentees": absentees}
+        )
+
+    context = {
+        "classrooms": classrooms,
+        "subjects": subjects,
+    }
+
+    return render(request, "attendance.html", context)
 
 
 # -------------------------
 # LOGOUT
 # -------------------------
+@login_required(login_url="login")
 def logout_view(request):
-    request.session.flush()
+    logout(request)
     return redirect("login")

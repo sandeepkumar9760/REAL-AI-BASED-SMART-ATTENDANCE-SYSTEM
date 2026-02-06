@@ -65,6 +65,19 @@
             color: #6b7280;
         }
 
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -174,16 +187,25 @@
             <p>Sign in to manage attendance records</p>
         </div>
 
-        <form id="loginForm">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form id="loginForm" method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="username">Username / Email</label>
-                <input type="text" id="username" placeholder="Enter your username or email">
+                <input type="text" id="username" name="username" placeholder="Enter your username or email" required>
                 <div class="error-message" id="usernameError">Please enter your username or email</div>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password">
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 <div class="error-message" id="passwordError">Please enter your password</div>
             </div>
 
@@ -232,29 +254,8 @@
 
         // Form submission handler
         loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            if (validateForm()) {
-                // Store user info for later Django API integration
-                const loginData = {
-                    username: usernameInput.value.trim(),
-                    password: passwordInput.value
-                };
-
-                // TODO: Replace with actual Django API call
-                // fetch('/api/login/', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(loginData)
-                // }).then(response => response.json())
-                //   .then(data => { ... });
-
-                // Simulate successful login
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('username', loginData.username);
-                
-                // Redirect to dashboard
-                window.location.href = 'dashboard.html';
+            if (!validateForm()) {
+                e.preventDefault();
             }
         });
 

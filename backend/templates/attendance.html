@@ -78,6 +78,7 @@
             font-family: 'Inter', sans-serif;
             cursor: pointer;
             transition: all 0.2s ease;
+            text-decoration: none;
         }
 
         .back-btn:hover {
@@ -242,7 +243,7 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .student-details h4 {
@@ -257,7 +258,7 @@
             color: #6b7280;
         }
 
-        /* Custom Checkbox */
+        /* Toggle Switch */
         .attendance-toggle {
             display: flex;
             align-items: center;
@@ -265,26 +266,25 @@
         }
 
         .toggle-label {
-            font-size: 13px;
-            color: #6b7280;
-            min-width: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            min-width: 60px;
             text-align: right;
         }
 
         .toggle-label.present {
-            color: #10b981;
-            font-weight: 500;
+            color: #059669;
         }
 
         .toggle-label.absent {
-            color: #ef4444;
-            font-weight: 500;
+            color: #dc2626;
         }
 
         .toggle-switch {
             position: relative;
-            width: 52px;
-            height: 28px;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
         }
 
         .toggle-switch input {
@@ -301,39 +301,40 @@
             right: 0;
             bottom: 0;
             background-color: #ef4444;
+            border-radius: 34px;
             transition: 0.3s;
-            border-radius: 28px;
         }
 
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 22px;
-            width: 22px;
+            height: 20px;
+            width: 20px;
             left: 3px;
             bottom: 3px;
             background-color: white;
-            transition: 0.3s;
             border-radius: 50%;
+            transition: 0.3s;
         }
 
-        .toggle-switch input:checked + .toggle-slider {
+        input:checked + .toggle-slider {
             background-color: #10b981;
         }
 
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(24px);
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
         }
 
         /* Submit Section */
         .submit-section {
-            padding: 24px;
-            background: #f9fafb;
-            display: flex;
+            display: none;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            margin-top: 24px;
+            padding: 20px 24px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .attendance-summary {
@@ -343,31 +344,26 @@
 
         .summary-item {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .summary-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
+        .summary-item .value {
+            font-size: 24px;
+            font-weight: 700;
         }
 
-        .summary-dot.present {
-            background: #10b981;
+        .summary-item.present .value {
+            color: #10b981;
         }
 
-        .summary-dot.absent {
-            background: #ef4444;
+        .summary-item.absent .value {
+            color: #ef4444;
         }
 
-        .summary-item span {
-            font-size: 14px;
-            color: #374151;
-        }
-
-        .summary-item strong {
-            font-weight: 600;
+        .summary-item .label {
+            font-size: 13px;
+            color: #6b7280;
         }
 
         .submit-btn {
@@ -388,192 +384,46 @@
             box-shadow: 0 10px 20px -10px rgba(102, 126, 234, 0.5);
         }
 
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         /* Toast Notification */
         .toast {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
             background: #1f2937;
             color: white;
             padding: 16px 24px;
             border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: bottom 0.3s ease;
+            z-index: 1000;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
         }
 
         .toast.show {
-            transform: translateY(0);
-            opacity: 1;
+            bottom: 24px;
         }
 
         .toast.success {
-            background: #059669;
+            background: #10b981;
         }
 
         .toast svg {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
         }
 
-        /* Absentee Alert */
-        .absentee-alert {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .absentee-alert.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .alert-content {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            transform: scale(0.9);
-            transition: all 0.3s ease;
-        }
-
-        .absentee-alert.show .alert-content {
-            transform: scale(1);
-        }
-
-        .alert-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .alert-icon {
-            width: 48px;
-            height: 48px;
-            background: #fef3c7;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .alert-icon svg {
-            width: 24px;
-            height: 24px;
-            color: #f59e0b;
-        }
-
-        .alert-header h3 {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1f2937;
-        }
-
-        .absentee-list {
-            margin-bottom: 24px;
-        }
-
-        .absentee-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: #fef2f2;
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .absentee-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .absentee-item .dot {
-            width: 8px;
-            height: 8px;
-            background: #ef4444;
-            border-radius: 50%;
-        }
-
-        .absentee-item span {
-            font-size: 14px;
-            color: #1f2937;
-        }
-
-        .alert-close-btn {
-            width: 100%;
-            padding: 14px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .alert-close-btn:hover {
-            background: #5a67d8;
-        }
-
-        @media (max-width: 640px) {
-            .navbar-brand h1 {
-                display: none;
-            }
-
-            .page-header h2 {
-                font-size: 20px;
-            }
-
-            .students-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .student-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 16px;
-            }
-
-            .attendance-toggle {
-                align-self: flex-end;
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
             }
 
             .submit-section {
                 flex-direction: column;
-            }
-
-            .attendance-summary {
-                width: 100%;
-                justify-content: space-between;
+                gap: 20px;
+                align-items: stretch;
             }
 
             .submit-btn {
@@ -594,12 +444,12 @@
                 </div>
                 <h1>Smart Attendance System</h1>
             </div>
-            <button class="back-btn" onclick="goBack()">
+            <a href="{% url 'dashboard' %}" class="back-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
                 <span>Back to Dashboard</span>
-            </button>
+            </a>
         </div>
     </nav>
 
@@ -607,169 +457,95 @@
     <main class="main-content">
         <div class="page-header">
             <h2>Mark Attendance</h2>
-            <p>Select class and subject, then mark attendance for each student</p>
+            <p id="currentDate">Loading...</p>
         </div>
 
         <!-- Filters -->
-        <div class="filters-section">
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label for="classSelect">Class</label>
-                    <select id="classSelect" onchange="loadStudents()">
-                        <option value="">Select Class</option>
-                        <option value="10A">Class 10-A</option>
-                        <option value="10B">Class 10-B</option>
-                        <option value="11A">Class 11-A</option>
-                        <option value="11B">Class 11-B</option>
-                        <option value="12A">Class 12-A</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="subjectSelect">Subject</label>
-                    <select id="subjectSelect">
-                        <option value="">Select Subject</option>
-                        <option value="math">Mathematics</option>
-                        <option value="physics">Physics</option>
-                        <option value="chemistry">Chemistry</option>
-                        <option value="english">English</option>
-                        <option value="cs">Computer Science</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="dateSelect">Date</label>
-                    <select id="dateSelect">
-                        <option value="today">Today</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+        <form method="POST" id="attendanceForm" action="{% url 'attendance' %}">
+            {% csrf_token %}
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="classroom">Select Class</label>
+                        <select id="classroom" name="classroom" onchange="loadStudents()" required>
+                            <option value="">-- Choose Class --</option>
+                            {% for classroom in classrooms %}
+                                <option value="{{ classroom.id }}">{{ classroom.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-        <!-- Students List -->
-        <div class="students-section">
-            <div class="students-header">
-                <h3>Students <span class="count" id="studentCount">(0 students)</span></h3>
-                <button class="mark-all-btn" onclick="markAllPresent()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 16px; height: 16px; display: inline; vertical-align: middle; margin-right: 4px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Mark All Present
-                </button>
-            </div>
+                    <div class="filter-group">
+                        <label for="subject">Select Subject</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">-- Choose Subject --</option>
+                            {% for subject in subjects %}
+                                <option value="{{ subject.id }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-            <div class="students-list" id="studentsList">
-                <div style="padding: 48px 24px; text-align: center; color: #6b7280;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 48px; height: 48px; margin: 0 auto 16px; color: #d1d5db;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <p>Select a class to view students</p>
+                    <div class="filter-group">
+                        <label for="dateSelect">Date</label>
+                        <select id="dateSelect" name="date" disabled>
+                            <option value="today">Today's Date</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="submit-section" id="submitSection" style="display: none;">
+            <!-- Students List -->
+            <div class="students-section">
+                <div class="students-header">
+                    <h3>Students <span class="count" id="studentCount"></span></h3>
+                    <button type="button" class="mark-all-btn" onclick="markAllPresent()">Mark All Present</button>
+                </div>
+                <div class="students-list" id="studentsList">
+                    <div style="padding: 48px 24px; text-align: center; color: #6b7280;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 48px; height: 48px; margin: 0 auto 16px; color: #d1d5db;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p>Select a class to view students</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Section -->
+            <div class="submit-section" id="submitSection">
                 <div class="attendance-summary">
-                    <div class="summary-item">
-                        <span class="summary-dot present"></span>
-                        <span>Present: <strong id="presentCount">0</strong></span>
+                    <div class="summary-item present">
+                        <div class="value" id="presentCount">0</div>
+                        <div class="label">Present</div>
                     </div>
-                    <div class="summary-item">
-                        <span class="summary-dot absent"></span>
-                        <span>Absent: <strong id="absentCount">0</strong></span>
+                    <div class="summary-item absent">
+                        <div class="value" id="absentCount">0</div>
+                        <div class="label">Absent</div>
                     </div>
                 </div>
-                <button class="submit-btn" onclick="submitAttendance()">Submit Attendance</button>
+                <button type="submit" class="submit-btn">Submit Attendance</button>
             </div>
-        </div>
+        </form>
     </main>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span id="toastMessage">Attendance submitted successfully!</span>
-    </div>
-
-    <!-- Absentee Alert Modal -->
-    <div class="absentee-alert" id="absenteeAlert">
-        <div class="alert-content">
-            <div class="alert-header">
-                <div class="alert-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-                <h3>Absent Students Detected</h3>
-            </div>
-            <div class="absentee-list" id="absenteeList">
-                <!-- Populated by JavaScript -->
-            </div>
-            <button class="alert-close-btn" onclick="closeAbsenteeAlert()">Acknowledge & Close</button>
-        </div>
+        <span id="toastMessage"></span>
     </div>
 
     <script>
-        // Dummy student data - will be replaced with Django API
-        const studentsData = {
-            '10A': [
-                { id: 1, name: 'Aditya Sharma', rollNo: '10A001' },
-                { id: 2, name: 'Priya Patel', rollNo: '10A002' },
-                { id: 3, name: 'Rahul Singh', rollNo: '10A003' },
-                { id: 4, name: 'Sneha Gupta', rollNo: '10A004' },
-                { id: 5, name: 'Vikram Reddy', rollNo: '10A005' },
-                { id: 6, name: 'Ananya Krishnan', rollNo: '10A006' },
-                { id: 7, name: 'Mohammed Khan', rollNo: '10A007' },
-                { id: 8, name: 'Kavitha Nair', rollNo: '10A008' },
-            ],
-            '10B': [
-                { id: 9, name: 'Arjun Menon', rollNo: '10B001' },
-                { id: 10, name: 'Deepika Joshi', rollNo: '10B002' },
-                { id: 11, name: 'Sanjay Verma', rollNo: '10B003' },
-                { id: 12, name: 'Meera Iyer', rollNo: '10B004' },
-                { id: 13, name: 'Karthik Rajan', rollNo: '10B005' },
-                { id: 14, name: 'Pooja Sharma', rollNo: '10B006' },
-            ],
-            '11A': [
-                { id: 15, name: 'Rohit Kumar', rollNo: '11A001' },
-                { id: 16, name: 'Anjali Das', rollNo: '11A002' },
-                { id: 17, name: 'Suresh Babu', rollNo: '11A003' },
-                { id: 18, name: 'Lakshmi Rao', rollNo: '11A004' },
-                { id: 19, name: 'Nikhil Saxena', rollNo: '11A005' },
-            ],
-            '11B': [
-                { id: 20, name: 'Amit Tiwari', rollNo: '11B001' },
-                { id: 21, name: 'Swati Mishra', rollNo: '11B002' },
-                { id: 22, name: 'Rajesh Pillai', rollNo: '11B003' },
-                { id: 23, name: 'Divya Nambiar', rollNo: '11B004' },
-            ],
-            '12A': [
-                { id: 24, name: 'Varun Malhotra', rollNo: '12A001' },
-                { id: 25, name: 'Shruti Agarwal', rollNo: '12A002' },
-                { id: 26, name: 'Manish Dubey', rollNo: '12A003' },
-                { id: 27, name: 'Neha Kapoor', rollNo: '12A004' },
-                { id: 28, name: 'Pranav Shetty', rollNo: '12A005' },
-                { id: 29, name: 'Ritu Bansal', rollNo: '12A006' },
-                { id: 30, name: 'Gaurav Pandey', rollNo: '12A007' },
-            ]
-        };
-
-        // Current attendance state
         let attendanceState = {};
-
-        // Check authentication
-        function checkAuth() {
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-            if (!isLoggedIn) {
-                window.location.href = 'login.html';
-                return false;
-            }
-            return true;
-        }
+        let studentsData = [];
 
         // Initialize page
         function init() {
-            if (!checkAuth()) return;
+            setCurrentDate();
+        }
 
-            // Set today's date
+        // Set current date
+        function setCurrentDate() {
             const today = new Date();
             const dateStr = today.toLocaleDateString('en-US', { 
                 weekday: 'long', 
@@ -777,18 +553,18 @@
                 month: 'long', 
                 day: 'numeric' 
             });
-            document.getElementById('dateSelect').innerHTML = `<option value="today">${dateStr}</option>`;
+            document.getElementById('currentDate').textContent = dateStr;
         }
 
         // Load students based on selected class
         function loadStudents() {
-            const classSelect = document.getElementById('classSelect');
-            const selectedClass = classSelect.value;
+            const classroomSelect = document.getElementById('classroom');
+            const selectedClassroom = classroomSelect.value;
             const studentsList = document.getElementById('studentsList');
             const submitSection = document.getElementById('submitSection');
             const studentCount = document.getElementById('studentCount');
 
-            if (!selectedClass) {
+            if (!selectedClassroom) {
                 studentsList.innerHTML = `
                     <div style="padding: 48px 24px; text-align: center; color: #6b7280;">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 48px; height: 48px; margin: 0 auto 16px; color: #d1d5db;">
@@ -801,23 +577,31 @@
                 return;
             }
 
-            // TODO: Replace with Django API call
-            // fetch(`/api/students/?class=${selectedClass}`)
-            //     .then(response => response.json())
-            //     .then(data => { renderStudents(data); });
+            // Fetch students from Django backend
+            fetch(`/get-students/?classroom_id=${selectedClassroom}`)
+                .then(response => response.json())
+                .then(data => {
+                    studentsData = data.students;
+                    
+                    // Initialize attendance state for all students (default: present)
+                    attendanceState = {};
+                    studentsData.forEach(student => {
+                        attendanceState[student.id] = true; // true = present
+                    });
 
-            const students = studentsData[selectedClass] || [];
-            
-            // Initialize attendance state for all students (default: present)
-            attendanceState = {};
-            students.forEach(student => {
-                attendanceState[student.id] = true; // true = present
-            });
-
-            renderStudents(students);
-            studentCount.textContent = `(${students.length} students)`;
-            submitSection.style.display = 'flex';
-            updateSummary();
+                    renderStudents(studentsData);
+                    studentCount.textContent = `(${studentsData.length} students)`;
+                    submitSection.style.display = 'flex';
+                    updateSummary();
+                })
+                .catch(error => {
+                    console.error('Error loading students:', error);
+                    studentsList.innerHTML = `
+                        <div style="padding: 48px 24px; text-align: center; color: #ef4444;">
+                            <p>Error loading students. Please try again.</p>
+                        </div>
+                    `;
+                });
         }
 
         // Render student list
@@ -839,7 +623,7 @@
                         <div class="student-avatar">${getInitials(student.name)}</div>
                         <div class="student-details">
                             <h4>${student.name}</h4>
-                            <p>Roll No: ${student.rollNo}</p>
+                            <p>Roll No: ${student.roll_number}</p>
                         </div>
                     </div>
                     <div class="attendance-toggle">
@@ -848,6 +632,7 @@
                         </span>
                         <label class="toggle-switch">
                             <input type="checkbox" 
+                                   name="present_${student.id}"
                                    id="attendance-${student.id}" 
                                    ${attendanceState[student.id] ? 'checked' : ''} 
                                    onchange="toggleAttendance(${student.id})">
@@ -901,111 +686,8 @@
             document.getElementById('absentCount').textContent = absent;
         }
 
-        // Submit attendance
-        function submitAttendance() {
-            const classSelect = document.getElementById('classSelect');
-            const subjectSelect = document.getElementById('subjectSelect');
-
-            if (!classSelect.value) {
-                alert('Please select a class');
-                return;
-            }
-
-            if (!subjectSelect.value) {
-                alert('Please select a subject');
-                return;
-            }
-
-            // Prepare attendance data for API
-            const attendanceData = {
-                class: classSelect.value,
-                subject: subjectSelect.value,
-                date: new Date().toISOString().split('T')[0],
-                attendance: Object.entries(attendanceState).map(([id, isPresent]) => ({
-                    studentId: parseInt(id),
-                    present: isPresent
-                }))
-            };
-
-            // TODO: Replace with Django API call
-            // fetch('/api/attendance/submit/', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(attendanceData)
-            // }).then(response => response.json())
-            //   .then(data => { ... });
-
-            console.log('Attendance Data:', attendanceData);
-
-            // Show success toast
-            showToast('Attendance submitted successfully!');
-
-            // Simulate absentee detection
-            const absentStudents = [];
-            const students = studentsData[classSelect.value] || [];
-            
-            students.forEach(student => {
-                if (!attendanceState[student.id]) {
-                    absentStudents.push(student);
-                }
-            });
-
-            // Show absentee alert if there are absent students
-            if (absentStudents.length > 0) {
-                setTimeout(() => {
-                    showAbsenteeAlert(absentStudents);
-                }, 1500);
-            }
-        }
-
-        // Show toast notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            
-            toastMessage.textContent = message;
-            toast.classList.add('show', 'success');
-
-            setTimeout(() => {
-                toast.classList.remove('show', 'success');
-            }, 3000);
-        }
-
-        // Show absentee alert modal
-        function showAbsenteeAlert(absentStudents) {
-            const alert = document.getElementById('absenteeAlert');
-            const list = document.getElementById('absenteeList');
-
-            list.innerHTML = absentStudents.map(student => `
-                <div class="absentee-item">
-                    <span class="dot"></span>
-                    <span>${student.name} (${student.rollNo})</span>
-                </div>
-            `).join('');
-
-            alert.classList.add('show');
-        }
-
-        // Close absentee alert
-        function closeAbsenteeAlert() {
-            const alert = document.getElementById('absenteeAlert');
-            alert.classList.remove('show');
-        }
-
-        // Go back to dashboard
-        function goBack() {
-            window.location.href = 'dashboard.html';
-        }
-
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', init);
-
-        // Close modal on outside click
-        document.getElementById('absenteeAlert').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeAbsenteeAlert();
-            }
-        });
     </script>
 </body>
 </html>
