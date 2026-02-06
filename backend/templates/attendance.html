@@ -536,12 +536,16 @@
     </div>
 
     <script>
+        // Store the get_students URL from Django
+        const GET_STUDENTS_URL = "{% url 'get_students' %}";
+        
         let attendanceState = {};
         let studentsData = [];
 
         // Initialize page
         function init() {
             setCurrentDate();
+            console.log('GET_STUDENTS_URL:', GET_STUDENTS_URL);  // Debug
         }
 
         // Set current date
@@ -577,10 +581,29 @@
                 return;
             }
 
+            // Show loading state
+            studentsList.innerHTML = `
+                <div style="padding: 48px 24px; text-align: center; color: #6b7280;">
+                    <p>Loading students...</p>
+                </div>
+            `;
+
             // Fetch students from Django backend
-            fetch(`/get-students/?classroom_id=${selectedClassroom}`)
-                .then(response => response.json())
+            const url = `${GET_STUDENTS_URL}?classroom_id=${selectedClassroom}`;
+            console.log('Fetching from:', url);  // Debug
+            
+            fetch(url)
+                .then(response => {
+                    console.log('Response status:', response.status);  // Debug
+                    console.log('Response headers:', response.headers);  // Debug
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Received data:', data);  // Debug
                     studentsData = data.students;
                     
                     // Initialize attendance state for all students (default: present)
@@ -598,7 +621,8 @@
                     console.error('Error loading students:', error);
                     studentsList.innerHTML = `
                         <div style="padding: 48px 24px; text-align: center; color: #ef4444;">
-                            <p>Error loading students. Please try again.</p>
+                            <p>Error loading students: ${error.message}</p>
+                            <p style="font-size: 12px; margin-top: 8px;">Check console for details</p>
                         </div>
                     `;
                 });

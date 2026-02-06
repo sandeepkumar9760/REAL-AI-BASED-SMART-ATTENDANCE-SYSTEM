@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from .models import Student
 
 from .models import (
     Student,
@@ -62,29 +63,21 @@ def dashboard_view(request):
     return render(request, "dashboard.html", context)
 
 
-# -------------------------
-# GET STUDENTS AJAX ENDPOINT
-# -------------------------
-@login_required(login_url="login")
-def get_students(request):
-    """AJAX endpoint to fetch students for a classroom"""
-    classroom_id = request.GET.get("classroom_id")
-    
-    if not classroom_id:
-        return JsonResponse({"error": "Classroom ID required"}, status=400)
-    
-    try:
-        students = Student.objects.filter(
-            classroom_id=classroom_id,
-            is_active=True
-        ).values('id', 'name', 'roll_number')
-        
-        return JsonResponse({
-            "students": list(students)
-        })
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
 
+
+
+def get_students(request):
+    classroom_id = request.GET.get("classroom_id")
+
+    if not classroom_id:
+        return JsonResponse({"students": []})
+
+    students = Student.objects.filter(
+        classroom_id=classroom_id,
+        is_active=True
+    ).values("id", "name", "roll_number")
+
+    return JsonResponse({"students": list(students)})
 
 # -------------------------
 # ATTENDANCE PAGE
