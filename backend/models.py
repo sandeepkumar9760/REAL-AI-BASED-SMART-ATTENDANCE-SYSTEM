@@ -41,6 +41,11 @@ class Student(models.Model):
         on_delete=models.CASCADE,
         related_name="students"
     )
+    face_image = models.ImageField(
+        upload_to="student_faces/",
+        null=True,
+        blank=True
+    )
     parent_contact = models.CharField(max_length=15)
     is_active = models.BooleanField(default=True)
 
