@@ -11,6 +11,76 @@
             padding: 0;
             box-sizing: border-box;
         }
+        /* ===== Attendance Mode Cards ===== */
+        .attendance-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .mode-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-4px);
+            border-color: #667eea;
+        }
+
+        .mode-card.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .mode-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .mode-card p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* ===== Camera Modal ===== */
+        .camera-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .camera-box {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .camera-box video {
+            width: 100%;
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+
+        .camera-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -459,6 +529,19 @@
             <h2>Mark Attendance</h2>
             <p id="currentDate">Loading...</p>
         </div>
+        <!-- Attendance Modes -->
+        <div class="attendance-modes">
+            <div class="mode-card active">
+                <h4>Manual Attendance</h4>
+                <p>Mark attendance using switches</p>
+            </div>
+
+            <div class="mode-card" onclick="openCameraModal()">
+                <h4>Camera Attendance</h4>
+                <p>Mark attendance using camera</p>
+            </div>
+        </div>
+
 
         <!-- Filters -->
         <form method="POST" id="attendanceForm" action="{% url 'attendance' %}">
@@ -534,6 +617,21 @@
         </svg>
         <span id="toastMessage"></span>
     </div>
+    <!-- Camera Attendance Modal -->
+    <div class="camera-modal" id="cameraModal">
+        <div class="camera-box">
+            <h3>Camera Attendance</h3>
+
+            <video id="video" autoplay></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+
+            <div class="camera-actions">
+                <button class="submit-btn" onclick="capturePhoto()">Capture</button>
+                <button class="back-btn" onclick="closeCameraModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // Store the get_students URL from Django
