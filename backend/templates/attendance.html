@@ -810,6 +810,48 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', init);
+        /* ================= CAMERA ATTENDANCE ================= */
+
+        let videoStream = null;
+
+        function openCameraModal() {
+            document.getElementById('cameraModal').style.display = 'flex';
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    videoStream = stream;
+                    document.getElementById('video').srcObject = stream;
+                })
+                .catch(() => {
+                    alert("Camera access denied");
+                });
+        }
+
+        function closeCameraModal() {
+            document.getElementById('cameraModal').style.display = 'none';
+
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            const imageData = canvas.toDataURL('image/png');
+
+            console.log("Captured Image:", imageData);
+
+            alert("Photo captured! Ready to send to backend.");
+        }
+
     </script>
 </body>
 </html>
