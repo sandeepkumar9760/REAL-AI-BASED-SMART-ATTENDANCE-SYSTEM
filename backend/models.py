@@ -104,10 +104,12 @@ class AttendanceSession(models.Model):
 # -----------------------------
 class Attendance(models.Model):
     attendance_session = models.ForeignKey(
-        AttendanceSession,
-        on_delete=models.CASCADE,
-        related_name="records"
-    )
+    AttendanceSession,
+    on_delete=models.CASCADE,
+    related_name="records",
+    null=True,
+    blank=True
+)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     is_present = models.BooleanField(default=False)
 
