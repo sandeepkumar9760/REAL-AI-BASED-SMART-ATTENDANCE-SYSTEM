@@ -11,8 +11,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 from backend.ai.face_ai import decode_base64_image, recognize_faces
-
-from backend.models import ClassRoom
+from backend.models import AttendanceSession, Attendance, Student, Subject, ClassRoom
 
 
 
@@ -157,17 +156,43 @@ def camera_ai_detect(request):
     data = json.loads(request.body)
     image_data = data.get("image")
     classroom_id = data.get("classroom_id")
+    subject_id = data.get("subject_id")  # <-- we will send this from frontend
 
-    if not image_data or not classroom_id:
+    if not image_data or not classroom_id or not subject_id:
         return JsonResponse({"error": "Missing data"}, status=400)
 
+    # Decode image & recognize faces
     image = decode_base64_image(image_data)
     present_students = recognize_faces(image, classroom_id)
 
-    present_names = [s.name for s in present_students]
+    today = timezone.now().date()
+
+    # Get or create session (prevents duplicates)
+    attendance_session, created = AttendanceSession.objects.get_or_create(
+        classroom_id=classroom_id,
+        subject_id=subject_id,
+        date=today,
+        defaults={"faculty": request.user.faculty if hasattr(request.user, "faculty") else None}
+    )
+
+    # All students of this class
+    all_students = Student.objects.filter(classroom_id=classroom_id)
+
+    present_ids = {s.id for s in present_students}
+
+    # Save attendance
+    for student in all_students:
+        Attendance.objects.update_or_create(
+            attendance_session=attendance_session,
+            student=student,
+            defaults={"is_present": student.id in present_ids}
+        )
 
     return JsonResponse({
-        "present": present_names,
-        "count": len(present_names)
+        "present": [s.name for s in present_students],
+        "absent": [
+            s.name for s in all_students if s.id not in present_ids
+        ],
+        "session_created": created
     })
 
