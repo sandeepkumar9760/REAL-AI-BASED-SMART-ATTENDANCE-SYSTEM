@@ -874,55 +874,76 @@
 
         function openCameraAttendance() {
             document.getElementById("cameraModal").style.display = "flex";
+
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(stream => {
                     cameraStream = stream;
                     document.getElementById("cameraVideo").srcObject = stream;
                 })
-                .catch(() => alert("Camera access denied"));
+                .catch(err => {
+                    alert("Camera access denied");
+                    console.error(err);
+                });
         }
 
         function closeCamera() {
             if (cameraStream) {
-                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream.getTracks().forEach(track => track.stop());
             }
             document.getElementById("cameraModal").style.display = "none";
         }
 
         function captureAndSend() {
-    const video = document.getElementById("cameraVideo");
-    const canvas = document.getElementById("cameraCanvas");
+            const video = document.getElementById("cameraVideo");
+            const canvas = document.getElementById("cameraCanvas");
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+            // Set canvas size
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
 
-    canvas.getContext("2d").drawImage(video, 0, 0);
-    const imageData = canvas.toDataURL("image/jpeg");
+            // Draw image
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0);
 
-    // ✅ MOVE THIS OUTSIDE fetch
-    const classroomId = document.getElementById("classroom").value;
+            // Convert to Base64
+            const imageData = canvas.toDataURL("image/jpeg");
 
-    fetch("/camera-ai-detect/", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
-        body: JSON.stringify({
-            image: imageData,
-            classroom_id: classroomId
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert("Detected students: " + data.present.join(", "));
-        closeCamera();
-    })
-    .catch(err => {
-        alert("Camera detection failed");
-        console.error(err);
-    });
-}
+            // ✅ REQUIRED IDs
+            const classroomId = document.getElementById("classroom").value;
+            const subjectId = document.getElementById("subject").value;
+
+            if (!classroomId || !subjectId) {
+                alert("Please select Class and Subject first");
+                return;
+            }
+
+            fetch("/camera-ai-detect/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    image: imageData,
+                    classroom_id: classroomId,
+                    subject_id: subjectId
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(
+                    "Present:\n" + data.present.join(", ") +
+                    "\n\nAbsent:\n" + data.absent.join(", ")
+                );
+                closeCamera();
+            })
+            .catch(err => {
+                alert("Camera detection failed");
+                console.error(err);
+            });
+        }
+
+
 
     </script>
     <!-- Camera Modal -->
