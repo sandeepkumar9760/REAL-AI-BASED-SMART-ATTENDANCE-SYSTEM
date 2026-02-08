@@ -890,28 +890,39 @@
         }
 
         function captureAndSend() {
-            const video = document.getElementById("cameraVideo");
-            const canvas = document.getElementById("cameraCanvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+    const video = document.getElementById("cameraVideo");
+    const canvas = document.getElementById("cameraCanvas");
 
-            canvas.getContext("2d").drawImage(video, 0, 0);
-            const imageData = canvas.toDataURL("image/jpeg");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-            fetch("/camera-ai-detect/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}"
-                },
-                body: JSON.stringify({ image: imageData })
-            })
-            .then(res => res.json())
-            .then(data => {
-                alert("Detected students: " + data.present.join(", "));
-                closeCamera();
-            });
-        }
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    const imageData = canvas.toDataURL("image/jpeg");
+
+    // ✅ MOVE THIS OUTSIDE fetch
+    const classroomId = document.getElementById("classroom").value;
+
+    fetch("/camera-ai-detect/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            image: imageData,
+            classroom_id: classroomId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert("Detected students: " + data.present.join(", "));
+        closeCamera();
+    })
+    .catch(err => {
+        alert("Camera detection failed");
+        console.error(err);
+    });
+}
 
     </script>
     <!-- Camera Modal -->

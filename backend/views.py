@@ -10,7 +10,8 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
-from backend.ai.face_ai import load_known_faces, recognize_faces
+from backend.ai.face_ai import decode_base64_image, recognize_faces
+
 from backend.models import ClassRoom
 
 
@@ -157,36 +158,16 @@ def camera_ai_detect(request):
     image_data = data.get("image")
     classroom_id = data.get("classroom_id")
 
-    classroom = Classroom.objects.get(id=classroom_id)
+    if not image_data or not classroom_id:
+        return JsonResponse({"error": "Missing data"}, status=400)
 
-    # Save classroom image temporarily
-    format, imgstr = image_data.split(";base64,")
-    image_bytes = base64.b64decode(imgstr)
+    image = decode_base64_image(image_data)
+    present_students = recognize_faces(image, classroom_id)
 
-    temp_dir = os.path.join(settings.MEDIA_ROOT, "temp")
-    os.makedirs(temp_dir, exist_ok=True)
-
-    filename = f"classroom_{uuid.uuid4()}.jpg"
-    image_path = os.path.join(temp_dir, filename)
-
-    with open(image_path, "wb") as f:
-        f.write(image_bytes)
-
-    # AI Recognition
-    known_encodings, known_students = load_known_faces(classroom)
-    recognized_students = recognize_faces(
-        image_path,
-        known_encodings,
-        known_students
-    )
+    present_names = [s.name for s in present_students]
 
     return JsonResponse({
-        "recognized_students": [
-            {
-                "id": s.id,
-                "name": s.name,
-                "roll_number": s.roll_number
-            }
-            for s in recognized_students
-        ]
+        "present": present_names,
+        "count": len(present_names)
     })
+
