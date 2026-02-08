@@ -11,7 +11,8 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 from backend.ai.face_ai import load_known_faces, recognize_faces
-from backend.models import Classroom
+from backend.models import ClassRoom
+
 
 
 from .models import (

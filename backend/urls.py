@@ -1,27 +1,24 @@
 from django.contrib import admin
 from django.urls import path
-from .views import (
-    login_view,
-    dashboard_view,
-    attendance_view,
-    logout_view,
-    get_students,
-)
+from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    path("", login_view, name="login"),
-    path("login/", login_view, name="login"),
-    path("logout/", logout_view, name="logout"),
+    path("", views.login_view, name="login"),
+    path("login/", views.login_view, name="login"),
+    path("logout/", views.logout_view, name="logout"),
 
-    path("dashboard/", dashboard_view, name="dashboard"),
-    path("attendance/", attendance_view, name="attendance"),
+    path("dashboard/", views.dashboard_view, name="dashboard"),
+    path("attendance/", views.attendance_view, name="attendance"),
 
     # AJAX
-    path("get-students/", get_students, name="get_students"),
+    path("get-students/", views.get_students, name="get_students"),
+
+    # AI Camera
     path(
-    "camera-ai-detect/",
-    views.camera_ai_detect,
-    name="camera_ai_detect"),
+        "camera-ai-detect/",
+        views.camera_ai_detect,
+        name="camera_ai_detect"
+    ),
 ]

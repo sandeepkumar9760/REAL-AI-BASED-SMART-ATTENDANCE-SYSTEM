@@ -547,6 +547,25 @@
         <form method="POST" id="attendanceForm" action="{% url 'attendance' %}">
             {% csrf_token %}
             <div class="filters-section">
+                                
+                <button
+                    type="button"
+                    onclick="openCameraAttendance()"
+                    style="
+                        margin-bottom: 16px;
+                        padding: 12px 20px;
+                        background: linear-gradient(135deg, #10b981, #059669);
+                        color: white;
+                        border: none;
+                        border-radius: 10px;
+                        font-weight: 600;
+                        cursor: pointer;
+                    "
+                >
+                    📷 Take Attendance via Camera
+                </button>
+
+
                 <div class="filters-grid">
                     <div class="filter-group">
                         <label for="classroom">Select Class</label>
