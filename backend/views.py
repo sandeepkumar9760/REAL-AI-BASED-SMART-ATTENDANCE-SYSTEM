@@ -5,6 +5,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Student
+import base64, uuid, os, json
+from django.http import JsonResponse
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
+from backend.ai.face_ai import load_known_faces, recognize_faces
+from backend.models import Classroom
+
 
 from .models import (
     Student,
@@ -138,3 +146,46 @@ def attendance_view(request):
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+@csrf_exempt
+def camera_ai_detect(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    data = json.loads(request.body)
+    image_data = data.get("image")
+    classroom_id = data.get("classroom_id")
+
+    classroom = Classroom.objects.get(id=classroom_id)
+
+    # Save classroom image temporarily
+    format, imgstr = image_data.split(";base64,")
+    image_bytes = base64.b64decode(imgstr)
+
+    temp_dir = os.path.join(settings.MEDIA_ROOT, "temp")
+    os.makedirs(temp_dir, exist_ok=True)
+
+    filename = f"classroom_{uuid.uuid4()}.jpg"
+    image_path = os.path.join(temp_dir, filename)
+
+    with open(image_path, "wb") as f:
+        f.write(image_bytes)
+
+    # AI Recognition
+    known_encodings, known_students = load_known_faces(classroom)
+    recognized_students = recognize_faces(
+        image_path,
+        known_encodings,
+        known_students
+    )
+
+    return JsonResponse({
+        "recognized_students": [
+            {
+                "id": s.id,
+                "name": s.name,
+                "roll_number": s.roll_number
+            }
+            for s in recognized_students
+        ]
+    })

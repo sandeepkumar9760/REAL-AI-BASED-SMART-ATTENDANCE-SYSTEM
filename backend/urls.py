@@ -20,4 +20,8 @@ urlpatterns = [
 
     # AJAX
     path("get-students/", get_students, name="get_students"),
+    path(
+    "camera-ai-detect/",
+    views.camera_ai_detect,
+    name="camera_ai_detect"),
 ]
