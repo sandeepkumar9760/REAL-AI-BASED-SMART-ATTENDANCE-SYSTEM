@@ -858,13 +858,17 @@ button:active {
 
         // Update attendance summary
         function updateSummary() {
-            const total = Object.keys(attendanceState).length;
-            const present = Object.values(attendanceState).filter(v => v).length;
-            const absent = total - present;
+    const total = Object.keys(attendanceState).length;
+    const present = Object.values(attendanceState).filter(v => v).length;
+    const absent = total - present;
 
-            document.getElementById('presentCount').textContent = present;
-            document.getElementById('absentCount').textContent = absent;
-        }
+    document.getElementById('presentCount').textContent = present;
+    document.getElementById('absentCount').textContent = absent;
+
+    const percent = total ? (present / total) * 100 : 0;
+    document.getElementById('attendanceBar').style.width = percent + "%";
+}
+
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', init);
