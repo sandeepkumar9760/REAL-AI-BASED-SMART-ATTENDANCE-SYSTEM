@@ -527,6 +527,35 @@ button:active {
 .submit-btn:hover {
   box-shadow: 0 10px 20px -10px rgba(102, 126, 234, 0.6);
 }
+/* Dark Mode */
+.dark {
+  --bg: #111827;
+  --card-bg: #1f2937;
+  --text-dark: #f9fafb;
+  --text-muted: #9ca3af;
+}
+
+.dark body {
+  background: var(--bg);
+  color: var(--text-dark);
+}
+
+.dark .manual-card,
+.dark .camera-card,
+.dark .filters-section,
+.dark .students-section,
+.dark .submit-section {
+  background: var(--card-bg);
+  color: var(--text-dark);
+}
+
+.dark select,
+.dark input {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
 
     </style>
 </head>
@@ -542,6 +571,9 @@ button:active {
                 </div>
                 <h1>Smart Attendance System</h1>
             </div>
+            <button onclick="toggleTheme()" class="theme-toggle">🌙</button>
+
+
             <a href="{% url 'dashboard' %}" class="back-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -984,6 +1016,18 @@ button:active {
                 console.error(err);
             });
         }
+        function toggleTheme() {
+    document.body.classList.toggle("dark");
+
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+}
+
+// Load saved theme on page load
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+}
+
 
 
 
