@@ -574,6 +574,10 @@ button:active {
         <!-- Filters -->
         <form method="POST" id="attendanceForm" action="{% url 'attendance' %}">
             {% csrf_token %}
+            <p id="formError"
+   style="display:none; color: var(--danger); font-size: 13px; margin-bottom: 14px;">
+</p>
+
             <p id="formError" style="display:none; color: var(--danger); font-size: 13px; margin-bottom: 12px;"></p>
 
             <div class="filters-section">
