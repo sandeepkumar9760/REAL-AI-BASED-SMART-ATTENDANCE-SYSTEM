@@ -620,7 +620,7 @@ button:active {
                 <p>Mark attendance using switches</p>
             </div>
 
-            <div class="mode-card" onclick="openCameraModal()">
+            <div class="mode-card" onclick="openCameraAttendance()">
                 <h4>Camera Attendance</h4>
                 <p>Mark attendance using camera</p>
             </div>
@@ -731,7 +731,6 @@ button:active {
         <span id="toastMessage"></span>
     </div>
     <!-- Camera Attendance Modal -->
-   <div id="cameraModal" style="...">
 
 
 
@@ -982,13 +981,30 @@ button:active {
             }
 
             fetch("/camera-ai-detect/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    headers: {
-    "Content-Type": "application/json",
-    "X-CSRFToken": getCookie("csrftoken")
-},
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken")
+    },
+    body: JSON.stringify({
+        image: imageData,
+        classroom_id: classroomId,
+        subject_id: subjectId
+    })
+})
+.then(res => res.json())
+.then(data => {
+    alert(
+        "Present:\n" + (data.present?.join(", ") || "None") +
+        "\n\nAbsent:\n" + (data.absent?.join(", ") || "None")
+    );
+    closeCamera();
+})
+.catch(err => {
+    alert("Camera detection failed");
+    console.error(err);
+});
+
 
                    
                 },
