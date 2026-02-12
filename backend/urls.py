@@ -21,4 +21,4 @@ urlpatterns = [
         views.camera_ai_detect,
         name="camera_ai_detect"
     ),
-]
+]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
