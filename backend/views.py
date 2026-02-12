@@ -12,7 +12,12 @@ from django.views.decorators.csrf import csrf_exempt
 
 from backend.ai.face_ai import decode_base64_image, recognize_faces
 from backend.models import AttendanceSession, Attendance, Student, Subject, ClassRoom
-
+import numpy as np
+import cv2
+import pickle
+import face_recognition
+from django.http import JsonResponse
+from .models import Student
 
 
 from .models import (
