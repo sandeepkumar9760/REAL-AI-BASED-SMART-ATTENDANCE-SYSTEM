@@ -66,7 +66,7 @@
         .camera-modal {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.8);
             display: none;
             align-items: center;
             justify-content: center;
@@ -561,42 +561,48 @@ button:active {
   box-shadow: 0 10px 20px -10px rgba(102, 126, 234, 0.6);
 }
 /* Dark Mode */
-.dark {
+body.dark {
   --bg: #111827;
   --card-bg: #1f2937;
   --text-dark: #f9fafb;
   --text-muted: #9ca3af;
-}
-
-body.dark {
   background: var(--bg);
   color: var(--text-dark);
 }
 
-
-.dark .manual-card,
-.dark .camera-card,
-.dark .filters-section,
-.dark .students-section,
-.dark .submit-section {
+/* Cards */
+body.dark .filters-section,
+body.dark .students-section,
+body.dark .submit-section {
   background: var(--card-bg);
   color: var(--text-dark);
 }
 
-.dark select,
-.dark input {
-  background: #374151;
-  color: #f9fafb;
-  border-color: #4b5563;
+/* Navbar */
+body.dark .navbar {
+  background: var(--card-bg);
+  border-bottom: 1px solid #374151;
 }
-.dark .theme-toggle {
+
+body.dark .navbar h1 {
+  color: var(--text-dark);
+}
+
+body.dark .back-btn {
   background: #374151;
-  border-color: #4b5563;
   color: #f9fafb;
 }
 
-.dark .theme-toggle:hover {
+body.dark .back-btn:hover {
   background: #4b5563;
+}
+
+/* Inputs */
+body.dark select,
+body.dark input {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
 }
 
 
@@ -1069,16 +1075,8 @@ if (localStorage.getItem("theme") === "dark") {
 
     </script>
     <!-- Camera Modal -->
-    <div id="cameraModal" style="
-        display:none;
-        position:fixed;
-        top:0; left:0;
-        width:100%; height:100%;
-        background:rgba(0,0,0,0.8);
-        z-index:2000;
-        align-items:center;
-        justify-content:center;
-    ">
+    <div id="cameraModal" class="camera-modal">
+
         <div style="
             background:white;
             padding:20px;
