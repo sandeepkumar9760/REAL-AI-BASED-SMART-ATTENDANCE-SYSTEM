@@ -1001,6 +1001,15 @@ button:active {
         console.error(err);
     });
 }
+function toggleTheme() {
+    document.body.classList.toggle("dark");
+
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+
+    document.querySelector(".theme-toggle").textContent = isDark ? "☀️" : "🌙";
+}
+
 
 
 
