@@ -69,6 +69,10 @@ TEMPLATES = [
     },
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
 WSGI_APPLICATION = 'backend.wsgi.application'
 LOGIN_URL = 'login'
 

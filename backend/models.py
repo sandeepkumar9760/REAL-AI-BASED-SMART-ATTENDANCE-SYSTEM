@@ -47,6 +47,8 @@ class Student(models.Model):
         blank=True
     )
     parent_contact = models.CharField(max_length=15)
+    face_image = models.ImageField(upload_to='student_faces/', null=True, blank=True)
+
     face_encoding = models.BinaryField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
