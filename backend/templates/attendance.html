@@ -991,12 +991,21 @@ body.dark {
     })
     .then(res => res.json())
     .then(data => {
-        alert(
-            "Present:\n" + (data.present?.join(", ") || "None") +
-            "\n\nAbsent:\n" + (data.absent?.join(", ") || "None")
-        );
-        closeCamera();
-    })
+    if (data.present) {
+        // Mark detected students as present
+        studentsData.forEach(student => {
+            attendanceState[student.id] = data.present.includes(student.name);
+        });
+
+        renderStudents(studentsData);
+        updateSummary();
+
+        showToast("Attendance marked successfully via AI!");
+    }
+
+    closeCamera();
+})
+
     .catch(err => {
         alert("Camera detection failed");
         console.error(err);
@@ -1010,6 +1019,19 @@ function toggleTheme() {
 
     document.querySelector(".theme-toggle").textContent = isDark ? "☀️" : "🌙";
 }
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    const toastMessage = document.getElementById("toastMessage");
+
+    toastMessage.textContent = message;
+    toast.classList.add("show", "success");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
+
 
 
 
