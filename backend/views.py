@@ -153,6 +153,52 @@ def logout_view(request):
     logout(request)
     return redirect("login")
 
+def decode_base64_image(image_data):
+    """
+    Decodes base64 image from frontend camera
+    """
+    format, imgstr = image_data.split(';base64,')
+    img_bytes = base64.b64decode(imgstr)
+
+    nparr = np.frombuffer(img_bytes, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+def recognize_faces(image, classroom_id):
+    """
+    Recognizes faces only among students of a specific classroom
+    """
+
+    face_locations = face_recognition.face_locations(image)
+    face_encodings = face_recognition.face_encodings(image, face_locations)
+
+    if not face_encodings:
+        return []
+
+    matched_students = []
+
+    students = Student.objects.filter(
+        classroom_id=classroom_id,
+        face_encoding__isnull=False
+    )
+
+    for face_encoding in face_encodings:
+        for student in students:
+            stored_encoding = pickle.loads(student.face_encoding)
+
+            matches = face_recognition.compare_faces(
+                [stored_encoding],
+                face_encoding,
+                tolerance=0.5
+            )
+
+            if True in matches:
+                matched_students.append(student)
+
+    return matched_students
+
+
 @csrf_exempt
 def camera_ai_detect(request):
     if request.method != "POST":
