@@ -957,84 +957,54 @@ button:active {
 
 
         function captureAndSend() {
-            const video = document.getElementById("cameraVideo");
-            const canvas = document.getElementById("cameraCanvas");
+    const video = document.getElementById("cameraVideo");
+    const canvas = document.getElementById("cameraCanvas");
 
-            // Set canvas size
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-            // Draw image
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0);
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
 
-            // Convert to Base64
-            const imageData = canvas.toDataURL("image/jpeg");
+    const imageData = canvas.toDataURL("image/jpeg");
 
-            // ✅ REQUIRED IDs
-            const classroomId = document.getElementById("classroom").value;
-            const subjectId = document.getElementById("subject").value;
+    const classroomId = document.getElementById("classroom").value;
+    const subjectId = document.getElementById("subject").value;
 
-            if (!classroomId || !subjectId) {
-                alert("Please select Class and Subject first");
-                return;
-            }
+    if (!classroomId || !subjectId) {
+        alert("Please select Class and Subject first");
+        return;
+    }
 
-            fetch("/camera-ai-detect/", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCookie("csrftoken")
-    },
-    body: JSON.stringify({
-        image: imageData,
-        classroom_id: classroomId,
-        subject_id: subjectId
+    fetch("/camera-ai-detect/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({
+            image: imageData,
+            classroom_id: classroomId,
+            subject_id: subjectId
+        })
     })
-})
-.then(res => res.json())
-.then(data => {
-    alert(
-        "Present:\n" + (data.present?.join(", ") || "None") +
-        "\n\nAbsent:\n" + (data.absent?.join(", ") || "None")
-    );
-    closeCamera();
-})
-.catch(err => {
-    alert("Camera detection failed");
-    console.error(err);
-});
-
-
-                   
-                },
-                body: JSON.stringify({
-                    image: imageData,
-                    classroom_id: classroomId,
-                    subject_id: subjectId
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                alert(
-                    "Present:\n" + data.present.join(", ") +
-                    "\n\nAbsent:\n" + data.absent.join(", ")
-                );
-                closeCamera();
-            })
-            .catch(err => {
-                alert("Camera detection failed");
-                console.error(err);
-            });
-        }
-        function toggleTheme() {
-    document.body.classList.toggle("dark");
-
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-
-    document.querySelector(".theme-toggle").textContent = isDark ? "☀️" : "🌙";
+    .then(res => res.json())
+    .then(data => {
+        alert(
+            "Present:\n" + (data.present?.join(", ") || "None") +
+            "\n\nAbsent:\n" + (data.absent?.join(", ") || "None")
+        );
+        closeCamera();
+    })
+    .catch(err => {
+        alert("Camera detection failed");
+        console.error(err);
+    });
 }
+
+
+
+             
 
 // Load saved theme
 if (localStorage.getItem("theme") === "dark") {
