@@ -47,6 +47,8 @@ class Student(models.Model):
         blank=True
     )
     parent_contact = models.CharField(max_length=15)
+    face_encoding = models.BinaryField(null=True, blank=True)
+
     is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
