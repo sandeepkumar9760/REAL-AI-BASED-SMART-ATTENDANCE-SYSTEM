@@ -28,32 +28,43 @@ class ClassRoom(models.Model):
 
     def __str__(self):
         return self.name
-
-
 # -----------------------------
 # STUDENT MODEL
 # -----------------------------
+
+from .face_utils import generate_face_encoding_from_image
+
 class Student(models.Model):
     roll_number = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=100)
+
     classroom = models.ForeignKey(
         ClassRoom,
         on_delete=models.CASCADE,
         related_name="students"
     )
+
     face_image = models.ImageField(
         upload_to="student_faces/",
         null=True,
         blank=True
     )
-    parent_contact = models.CharField(max_length=15)
-    face_image = models.ImageField(upload_to='student_faces/', null=True, blank=True)
 
     face_encoding = models.BinaryField(null=True, blank=True)
 
-    is_active = models.BooleanField(default=True)
+    parent_contact = models.CharField(max_length=15)
 
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.face_image and not self.face_encoding:
+            encoding = generate_face_encoding_from_image(self.face_image.path)
+            if encoding:
+                self.face_encoding = encoding
+                super().save(update_fields=["face_encoding"])
 
     def __str__(self):
         return f"{self.roll_number} - {self.name}"
