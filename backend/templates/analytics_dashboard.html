@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Inter, sans-serif;
+            background: #f3f4f6;
+            padding: 30px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Attendance Analytics Dashboard</h1>
+
+<div class="card-grid">
+    <div class="card">
+        <h3>Total Students</h3>
+        <p id="totalStudents">-</p>
+    </div>
+    <div class="card">
+        <h3>Total Sessions</h3>
+        <p id="totalSessions">-</p>
+    </div>
+    <div class="card">
+        <h3>Overall Attendance Rate</h3>
+        <p id="overallRate">-</p>
+    </div>
+    <div class="card">
+        <h3>Total Present</h3>
+        <p id="presentCount">-</p>
+    </div>
+</div>
+
+<div class="chart-container">
+    <h3>Last 7 Days Attendance Trend</h3>
+    <canvas id="attendanceChart"></canvas>
+</div>
+
+<div class="chart-container">
+    <h3>Top 5 Most Absent Students</h3>
+    <canvas id="absentChart"></canvas>
+</div>
+
+<script>
+fetch("/analytics-data/")
+    .then(res => res.json())
+    .then(data => {
+
+        // Fill summary cards
+        document.getElementById("totalStudents").innerText = data.summary.total_students;
+        document.getElementById("totalSessions").innerText = data.summary.total_sessions;
+        document.getElementById("overallRate").innerText = data.summary.overall_rate + "%";
+        document.getElementById("presentCount").innerText = data.summary.present_count;
+
+        // Attendance trend chart
+        const dates = data.daily_stats.map(d => d.date).reverse();
+        const rates = data.daily_stats.map(d => d.attendance_rate).reverse();
+
+        new Chart(document.getElementById("attendanceChart"), {
+            type: "line",
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: "Attendance %",
+                    data: rates,
+                    borderWidth: 2,
+                    fill: false
+                }]
+            }
+        });
+
+        // Top absent chart
+        const names = data.top_absent.map(d => d.student__name);
+        const counts = data.top_absent.map(d => d.absent_count);
+
+        new Chart(document.getElementById("absentChart"), {
+            type: "bar",
+            data: {
+                labels: names,
+                datasets: [{
+                    label: "Absences",
+                    data: counts,
+                    borderWidth: 1
+                }]
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>
