@@ -87,50 +87,58 @@
 </div>
 
 <script>
-fetch("/analytics-data/")
-    .then(res => res.json())
-    .then(data => {
+function loadAnalytics() {
 
-        // Fill summary cards
-        document.getElementById("totalStudents").innerText = data.summary.total_students;
-        document.getElementById("totalSessions").innerText = data.summary.total_sessions;
-        document.getElementById("overallRate").innerText = data.summary.overall_rate + "%";
-        document.getElementById("presentCount").innerText = data.summary.present_count;
+    const classId = document.getElementById("classFilter").value;
+    let url = "/analytics-data/";
 
-        // Attendance trend chart
-        const dates = data.daily_stats.map(d => d.date).reverse();
-        const rates = data.daily_stats.map(d => d.attendance_rate).reverse();
+    if (classId) {
+        url += "?classroom_id=" + classId;
+    }
 
-        new Chart(document.getElementById("attendanceChart"), {
-            type: "line",
-            data: {
-                labels: dates,
-                datasets: [{
-                    label: "Attendance %",
-                    data: rates,
-                    borderWidth: 2,
-                    fill: false
-                }]
-            }
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+
+            document.getElementById("totalStudents").innerText = data.summary.total_students;
+            document.getElementById("totalSessions").innerText = data.summary.total_sessions;
+            document.getElementById("overallRate").innerText = data.summary.overall_rate + "%";
+            document.getElementById("presentCount").innerText = data.summary.present_count;
+
+            const dates = data.daily_stats.map(d => d.date).reverse();
+            const rates = data.daily_stats.map(d => d.attendance_rate).reverse();
+
+            new Chart(document.getElementById("attendanceChart"), {
+                type: "line",
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: "Attendance %",
+                        data: rates,
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                }
+            });
+
+            const names = data.top_absent.map(d => d.student__name);
+            const counts = data.top_absent.map(d => d.absent_count);
+
+            new Chart(document.getElementById("absentChart"), {
+                type: "bar",
+                data: {
+                    labels: names,
+                    datasets: [{
+                        label: "Absences",
+                        data: counts,
+                        borderWidth: 1
+                    }]
+                }
+            });
+
         });
+}
 
-        // Top absent chart
-        const names = data.top_absent.map(d => d.student__name);
-        const counts = data.top_absent.map(d => d.absent_count);
-
-        new Chart(document.getElementById("absentChart"), {
-            type: "bar",
-            data: {
-                labels: names,
-                datasets: [{
-                    label: "Absences",
-                    data: counts,
-                    borderWidth: 1
-                }]
-            }
-        });
-
-    });
 </script>
 
 </body>
