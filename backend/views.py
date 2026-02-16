@@ -27,6 +27,67 @@ from .models import (
     AttendanceSession,
     Attendance
 )
+from django.db.models import Count, Q
+from django.utils import timezone
+
+
+def attendance_analytics(request):
+    today = timezone.now().date()
+
+    # Overall stats
+    total_students = Student.objects.count()
+    total_sessions = AttendanceSession.objects.count()
+    total_attendance_records = Attendance.objects.count()
+
+    present_count = Attendance.objects.filter(is_present=True).count()
+    absent_count = Attendance.objects.filter(is_present=False).count()
+
+    overall_rate = (
+        (present_count / total_attendance_records) * 100
+        if total_attendance_records > 0 else 0
+    )
+
+    # Daily stats (last 7 days)
+    last_7_days = (
+        AttendanceSession.objects
+        .order_by('-date')[:7]
+    )
+
+    daily_stats = []
+    for session in last_7_days:
+        total = Attendance.objects.filter(attendance_session=session).count()
+        present = Attendance.objects.filter(
+            attendance_session=session,
+            is_present=True
+        ).count()
+
+        rate = (present / total) * 100 if total > 0 else 0
+
+        daily_stats.append({
+            "date": session.date.strftime("%Y-%m-%d"),
+            "attendance_rate": round(rate, 2)
+        })
+
+    # Top absent students
+    top_absent = (
+        Attendance.objects
+        .filter(is_present=False)
+        .values("student__name")
+        .annotate(absent_count=Count("id"))
+        .order_by("-absent_count")[:5]
+    )
+
+    return JsonResponse({
+        "summary": {
+            "total_students": total_students,
+            "total_sessions": total_sessions,
+            "overall_rate": round(overall_rate, 2),
+            "present_count": present_count,
+            "absent_count": absent_count,
+        },
+        "daily_stats": daily_stats,
+        "top_absent": list(top_absent)
+    })
 
 
 # -------------------------
