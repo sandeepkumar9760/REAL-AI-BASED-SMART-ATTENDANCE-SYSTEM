@@ -30,6 +30,10 @@ from .models import (
 from django.db.models import Count, Q
 from django.utils import timezone
 
+from django.shortcuts import render
+
+def analytics_dashboard(request):
+    return render(request, "analytics_dashboard.html")
 
 def attendance_analytics(request):
     today = timezone.now().date()
