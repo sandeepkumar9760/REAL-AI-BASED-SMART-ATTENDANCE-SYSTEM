@@ -16,6 +16,8 @@ urlpatterns = [
 
     # AJAX
     path("get-students/", views.get_students, name="get_students"),
+    path("analytics-data/", views.attendance_analytics, name="attendance_analytics"),
+
 
     # AI Camera
     path(
