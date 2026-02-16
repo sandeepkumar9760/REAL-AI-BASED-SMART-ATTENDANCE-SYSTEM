@@ -36,34 +36,53 @@ def analytics_dashboard(request):
     return render(request, "analytics_dashboard.html")
 
 def attendance_analytics(request):
-    today = timezone.now().date()
 
-    # Overall stats
-    total_students = Student.objects.count()
-    total_sessions = AttendanceSession.objects.count()
-    total_attendance_records = Attendance.objects.count()
+    classroom_id = request.GET.get("classroom_id")
+    subject_id = request.GET.get("subject_id")
 
-    present_count = Attendance.objects.filter(is_present=True).count()
-    absent_count = Attendance.objects.filter(is_present=False).count()
-
-    overall_rate = (
-        (present_count / total_attendance_records) * 100
-        if total_attendance_records > 0 else 0
+    attendance_qs = Attendance.objects.select_related(
+        "student",
+        "attendance_session",
+        "attendance_session__classroom",
+        "attendance_session__subject"
     )
 
-    # Daily stats (last 7 days)
-    last_7_days = (
+    # Apply filters
+    if classroom_id:
+        attendance_qs = attendance_qs.filter(
+            attendance_session__classroom_id=classroom_id
+        )
+
+    if subject_id:
+        attendance_qs = attendance_qs.filter(
+            attendance_session__subject_id=subject_id
+        )
+
+    total_students = Student.objects.filter(is_active=True).count()
+    total_sessions = AttendanceSession.objects.count()
+
+    total_records = attendance_qs.count()
+    present_count = attendance_qs.filter(is_present=True).count()
+    absent_count = attendance_qs.filter(is_present=False).count()
+
+    overall_rate = (
+        (present_count / total_records) * 100
+        if total_records > 0 else 0
+    )
+
+    # ===== DAILY TREND =====
+    last_7_sessions = (
         AttendanceSession.objects
         .order_by('-date')[:7]
     )
 
     daily_stats = []
-    for session in last_7_days:
-        total = Attendance.objects.filter(attendance_session=session).count()
-        present = Attendance.objects.filter(
-            attendance_session=session,
-            is_present=True
-        ).count()
+
+    for session in last_7_sessions:
+        session_records = attendance_qs.filter(attendance_session=session)
+
+        total = session_records.count()
+        present = session_records.filter(is_present=True).count()
 
         rate = (present / total) * 100 if total > 0 else 0
 
@@ -72,14 +91,35 @@ def attendance_analytics(request):
             "attendance_rate": round(rate, 2)
         })
 
-    # Top absent students
+    # ===== TOP ABSENT STUDENTS =====
     top_absent = (
-        Attendance.objects
+        attendance_qs
         .filter(is_present=False)
         .values("student__name")
         .annotate(absent_count=Count("id"))
         .order_by("-absent_count")[:5]
     )
+
+    # ===== RISK DETECTION (Below 60%) =====
+    student_stats = (
+        attendance_qs
+        .values("student__name")
+        .annotate(
+            total=Count("id"),
+            present=Count("id", filter=Q(is_present=True))
+        )
+    )
+
+    risk_students = []
+
+    for s in student_stats:
+        if s["total"] > 0:
+            rate = (s["present"] / s["total"]) * 100
+            if rate < 60:
+                risk_students.append({
+                    "name": s["student__name"],
+                    "rate": round(rate, 2)
+                })
 
     return JsonResponse({
         "summary": {
@@ -90,10 +130,9 @@ def attendance_analytics(request):
             "absent_count": absent_count,
         },
         "daily_stats": daily_stats,
-        "top_absent": list(top_absent)
+        "top_absent": list(top_absent),
+        "risk_students": risk_students
     })
-
-
 # -------------------------
 # LOGIN PAGE
 # -------------------------
